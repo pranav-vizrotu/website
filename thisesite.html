@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Exposure Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #555;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e7f3e7;
+            border: 1px solid #b2d8b2;
+            border-radius: 4px;
+            color: #2e8b57;
+        }
+
+        .error {
+            background: #f3e7e7;
+            border: 1px solid #d8b2b2;
+            color: #8b2e2e;
+        }
+
+        .visual-container {
+            margin-top: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .glass {
+            width: 100px;
+            height: 200px;
+            border: 5px solid #000;
+            border-radius: 0 0 50px 50px;
+            position: relative;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .water {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #4CAF50;
+            transition: height 0.5s;
+        }
+
+        .characters {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .character img {
+            width: 200px;
+            height: auto;
+            /* Maintain aspect ratio */
+        }
+
+        .dialogue {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Trading Exposure Calculator</h1>
+
+        <label for="buyingPower">Buying Power (USD):</label>
+        <input type="number" id="buyingPower" value="200000" readonly>
+
+        <label for="stockPrice">Stock/ETF Price (USD):</label>
+        <input type="number" id="stockPrice" min="5" step="0.01" required>
+
+        <label for="entryPrice">Entry Price (USD):</label>
+        <input type="number" id="entryPrice" min="5" step="0.01" required>
+
+        <label for="stopLossPrice">Stop Loss Price (USD):</label>
+        <input type="number" id="stopLossPrice" min="0.01" step="0.01">
+
+        <label for="stopLossSize">Stop Loss Size (USD):</label>
+        <input type="number" id="stopLossSize" min="0.01" step="0.01">
+
+        <label for="riskAmount">Amount to be Risked (USD):</label>
+        <input type="number" id="riskAmount" min="0.01" step="0.01" required>
+
+        <button onclick="calculateExposure()">Calculate Lots</button>
+
+        <div id="result" class="result" style="display:none;"></div>
+
+        <div id="visualContainer" class="visual-container">
+            <div id="dialogue" class="dialogue"></div>
+            <div class="glass">
+                <div id="water" class="water" style="height: 0%;"></div>
+            </div>
+            <div class="characters">
+                <div class="character">
+                    <img id="tom" src="tom.png" alt="Tom">
+                </div>
+                <div class="character">
+                    <img id="jerry" src="jerry.png" alt="Jerry">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateExposure() {
+            var buyingPower = 200000; // Participant's buying power
+            var stockPrice = parseFloat(document.getElementById('stockPrice').value);
+            var entryPrice = parseFloat(document.getElementById('entryPrice').value);
+            var stopLossPrice = parseFloat(document.getElementById('stopLossPrice').value);
+            var stopLossSize = parseFloat(document.getElementById('stopLossSize').value);
+            var riskAmount = parseFloat(document.getElementById('riskAmount').value);
+
+            // Validate inputs
+            if (stockPrice < 5 || entryPrice < 5) {
+                alert('Stock/ETF Price and Entry Price must be at least $5.00');
+                return;
+            }
+
+            if (!stopLossPrice && !stopLossSize) {
+                alert('Please provide either Stop Loss Price or Stop Loss Size');
+                return;
+            }
+
+            var stopLossAmount;
+            if (stopLossPrice) {
+                stopLossAmount = Math.abs(entryPrice - stopLossPrice);
+            } else {
+                stopLossAmount = stopLossSize;
+            }
+
+            if (stopLossAmount <= 0) {
+                alert('Stop Loss amount must be greater than 0');
+                return;
+            }
+
+            var quantity = Math.floor(riskAmount / stopLossAmount);
+            var exposure = stockPrice * quantity;
+            var maxLotsByExposure = Math.floor(50000 / stockPrice);
+            var maxLotsByRules = Math.min(10000, maxLotsByExposure);
+
+            var resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+
+            var dialogue = document.getElementById('dialogue');
+            var water = document.getElementById('water');
+            var tom = document.getElementById('tom');
+            var jerry = document.getElementById('jerry');
+
+            if (exposure > 50000 || quantity > 10000) {
+                var overexposureAmount = Math.max(exposure - 50000, (quantity - maxLotsByRules) * stockPrice);
+                resultDiv.classList.add('error');
+                resultDiv.innerHTML = `
+                    <p>Overexposure Detected!</p>
+                    <p>Total Exposure: $${exposure.toFixed(2)}</p>
+                    <p>Overexposure Amount: $${overexposureAmount.toFixed(2)}</p>
+                    <p>Highest Number of Lots without Overexposure: ${maxLotsByRules}</p>
+                `;
+
+                water.style.height = '100%';
+                water.style.backgroundColor = '#F44336';
+                dialogue.innerHTML = 'Overexposed!';
+                tom.src = 'sad-tom.png'; // Replace with actual path to sad-tom.png
+                jerry.src = 'sad-jerry.jpg'; // Replace with actual path to sad-jerry.png
+            } else {
+                resultDiv.classList.remove('error');
+                resultDiv.innerHTML = `
+                    <p>Number of Lots: ${quantity}</p>
+                    <p>Total Exposure: $${exposure.toFixed(2)}</p>
+                    <p>Buying Power: $${buyingPower.toFixed(2)}</p>
+                    <p>Risk Amount: $${riskAmount.toFixed(2)}</p>
+                    <p>Stop Loss Amount: $${stopLossAmount.toFixed(2)}</p>
+                `;
+
+                var exposurePercentage = (exposure / 50000) * 100;
+
+                water.style.height = `${exposurePercentage}%`;
+                water.style.backgroundColor = '#4CAF50';
+                dialogue.innerHTML = 'Safe Exposure';
+                tom.src = 'happy-tom.jpg'; // Replace with actual path to happy-tom.png
+                jerry.src = 'happy-jerry.png'; // Replace with actual path to happy-jerry.png
+            }
+        }
+    </script>
+</body>
+
+</html>

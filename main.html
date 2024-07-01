@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riddle Challenge: Unlock the Exposure Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .riddle {
+            margin-bottom: 30px;
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .answer-input {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 60%;
+            max-width: 400px;
+            font-size: 16px;
+        }
+
+        .submit-button {
+            padding: 15px 30px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .result a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Riddle Challenge</h1>
+
+        <div class="riddle">
+            <div class="question">Riddle 1: What has keys but can't open locks?</div>
+            <input type="text" id="answer1" class="answer-input" placeholder="Your answer...">
+        </div>
+
+        <div class="riddle">
+            <div class="question">Riddle 2: I speak without a mouth and hear without ears. I have no body, but I come
+                alive with the wind. What am I?</div>
+            <input type="text" id="answer2" class="answer-input" placeholder="Your answer...">
+        </div>
+
+        <button onclick="checkAnswers()" class="submit-button">Submit Answers</button>
+
+        <div id="result" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        function checkAnswers() {
+            var answer1 = document.getElementById('answer1').value.trim().toLowerCase();
+            var answer2 = document.getElementById('answer2').value.trim().toLowerCase();
+
+            if (answer1 === 'keyboard' && answer2 === 'echo') {
+                var resultDiv = document.getElementById('result');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = 'Congratulations! You have unlocked the <a href="thisesite.html">Exposure Calculator</a>.';
+            } else {
+                alert('Oops! One or more answers are incorrect. Please try again.');
+            }
+        }
+    </script>
+</body>
+
+</html>
